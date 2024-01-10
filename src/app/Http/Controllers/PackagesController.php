@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\Storage;
 use App\DataTransferObjects\PackageDto;
+use OpenAI\Responses\Threads\Runs\ThreadRunResponse;
+use OpenAI\Responses\Threads\ThreadResponse;
 
 class PackagesController {
 
@@ -82,28 +84,49 @@ class PackagesController {
 
     private function parsePackageStringToJson(string $newPackageData)
     {
-        $result = OpenAI::completions()->create([
-            'model' => 'gpt-3.5-turbo',
-            'prompt' => sprintf(<<<EOD
-            Format the data in to this structure.
-
-            Structure:
-            %s
-
-            Data to be formatted:
-            %s
-            EOD, $this->getPackageStruct(), $newPackageData),
+        $thread = OpenAI::threads()->createAndRun([
+            'assistant_id' => 'asst_Kx44RNw6tcMPGrFRO3ad4FNU',
+            'thread' => [
+                'messages' => [
+                    [
+                        'role' => 'user',
+                        'content' => $newPackageData,
+                    ],
+                ],
+            ],
         ]);
+
+        $result = $this->loadAnswer($thread);
 
         return $result;
     }
 
-    private function getPackageStruct()
+    private function loadAnswer(ThreadRunResponse $threadRun)
     {
-        return <<<EOD
-        Specifications -> Name, CPU, Memory, Storage, Traffic, OS, Uplink, Guaranteed Speed, DDoS Shield, Remote Management, Support
-        Payment -> Payment Period, Payment Status
-        Other Notes -> ...
-        EOD;
+        while(in_array($threadRun->status, ['queued', 'in_progress'])) {
+            $threadRun = OpenAI::threads()->runs()->retrieve(
+                threadId: $threadRun->threadId,
+                runId: $threadRun->id,
+            );
+        }
+
+        if ($threadRun->status !== 'completed') {
+            return 'Request failed, please try again';
+        }
+
+        $messageList = OpenAI::threads()->messages()->list(
+            threadId: $threadRun->threadId,
+        );
+
+        return $messageList->data[0]->content[0]->text->value;
     }
+
+    // private function sanitize(string $str) {
+
+    //     $str = str_replace('```', '', $str);
+    //     $str = str_replace('\n', '', $str);
+    //     $str = str_replace('\\', '', $str);
+
+    //     return $str;
+    // }
 }
