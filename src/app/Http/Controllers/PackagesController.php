@@ -32,11 +32,18 @@ class PackagesController {
     public function add(Request $request) 
     {
         
+        $dedicatedId    = $request->input('dedicated_id');
         $newPackageData = $request->input('package');
+
+        if (empty($dedicatedId)) {
+            return response()->json([
+                'error' => 'You tried saving an package without `dedicated_id`.'
+            ]);
+        }
 
         if (empty($newPackageData)) {
             return response()->json([
-                'error' => 'You tried saving an empty package.'
+                'error' => 'You tried saving an empty `package`.'
             ]);
         }
 
@@ -51,8 +58,6 @@ class PackagesController {
                 'error' => $e->getMessage()
             ]);
         }
-
-        return response()->json($result); // debug
 
         $packageListUpdated = Storage::put('packages.json', json_encode($packages));
 
