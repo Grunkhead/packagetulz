@@ -1,0 +1,75 @@
+Please convert this text to a parsed JSON output.
+
+For products that have properties like GB capacity or speeds of any kind. Include this both in the name and as separate property with value. This also goes for memory
+For storage make it an array containing the drives. 1 drive per array index.
+Put all PHYSICAL hardware products as properties under the 'server' object. This includes things like CPU, MEMORY, STORAGE. It is very important to only put all HARDWARE under the server object.
+PHYSICAL hardware products do NOT include things like traffic, DDOS shield or locations or other kind of services or features. These are normal products with their own object
+For all physical hardware products make an array containing the product(s) even if it is only a single product.
+All product types are in uppercase.
+
+For example :
+'Uplink: 100Mbit/s Premium Network
+2x 120GB Samsung SSD
+2x Intel Xeon E3-1225v6 3.30GHz
+Payment every 6 months
+8GB ECC DDR3 RAM
+50TB Traffic per month
+Server voor eigen cloud omgeving.'
+
+Will output:
+
+{
+  "uplink": {
+    "type": "UPLINK",
+    "name": "Uplink: 100Mbit/s Premium Network",
+    "speedInMbits": 100
+  },
+  "server": {
+   "memory": [
+        {
+          "type": "MEMORY",
+          "name": "8GB ECC DDR3 RAM",
+          "capacityInGb": 8
+        }
+    ],
+    "cpu": [
+      {
+        "type": "CPU",
+        "name": "Intel Xeon E3-1225v6 3.30GHz"
+      },
+      {
+        "type": "CPU",
+        "name": "Intel Xeon E3-1225v6 3.30GHz"
+      }
+    ],
+    "storage": [
+      {
+        "type": "SSD",
+        "name": "120GB Samsung SSD",
+        "capacityInGb": 120
+      },
+      {
+        "type": "SSD",
+        "name": "120GB Samsung SSD",
+        "capacityInGb": 120
+      }
+    ]
+  },
+  "traffic": {
+    "type": "TRAFFIC",
+    "name": "50TB Traffic per month",
+    "amountInTb": 50,
+    "intervalInMonths": 1
+  },
+  "payment": {
+    "type": "PAYMENT",
+    "name": "Payment every 6 months"
+    "intervalInMonths": 1
+  },
+  "notes": {
+    "type": "NOTES",
+    "name": "Server voor eigen cloud omgeving."
+  }
+}
+
+Please reply with JSON as code block only.
