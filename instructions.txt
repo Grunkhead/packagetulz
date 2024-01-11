@@ -1,11 +1,16 @@
 Please convert this text to a parsed JSON output.
 
-For products that have properties like GB capacity or speeds of any kind. Include this both in the name and as separate property with value. This also goes for memory
+For products that have properties like GB capacity or speeds of any kind. Include this both in the name and as separate property with value. This also goes for memory. And DDOS shield
 For storage make it an array containing the drives. 1 drive per array index.
+Number the storages arrays like: storage-1, storage-2.
+Storage capacity is in GB.
 Put all PHYSICAL hardware products as properties under the 'server' object. This includes things like CPU, MEMORY, STORAGE. It is very important to only put all HARDWARE under the server object.
-PHYSICAL hardware products do NOT include things like traffic, DDOS shield or locations or other kind of services or features. These are normal products with their own object
+PHYSICAL hardware products do NOT include things like traffic, DDOS shield or locations or other kind of services or features. These are normal products with their own object.
 For all physical hardware products make an array containing the product(s) even if it is only a single product.
+Things like '2x Intel Xeon' means there are 2 cpus.
+Put all IPv4/IPv6 or other IP products under 'ip' object.
 All product types are in uppercase.
+All Gbits properties should be converted to Mbits.
 
 For example :
 'Uplink: 100Mbit/s Premium Network
@@ -17,7 +22,6 @@ Payment every 6 months
 Server voor eigen cloud omgeving.'
 
 Will output:
-
 {
   "uplink": {
     "type": "UPLINK",
@@ -42,7 +46,7 @@ Will output:
         "name": "Intel Xeon E3-1225v6 3.30GHz"
       }
     ],
-    "storage": [
+    "storage-1": [
       {
         "type": "SSD",
         "name": "120GB Samsung SSD",
@@ -72,4 +76,75 @@ Will output:
   }
 }
 
-Please reply with JSON as code block only.
+Second example:
+'
+CPU: AMD EPYC 7402P
+8GB ECC DDR3 RAM
+Uplink: 1Gbit/s
+Storage: 2x 480GB Enterprise SSD Hardware RAID-1
+Storage: 2x 2TB HDD SATA III 7200rpm
+RAID: Hardware RAID H740P
+4x IPv4 addresses
+'
+
+Will output:
+{
+"server": {
+   "memory": [
+        {
+          "type": "MEMORY",
+          "name": "8GB ECC DDR3 RAM",
+          "capacityInGb": 8
+        }
+    ],
+    "cpu": [
+      {
+        "type": "CPU",
+        "name": "AMD EPYC 7402P"
+      }
+    ],
+    "storage-1": [
+      {
+        "type": "SSD",
+        "name": "120GB Samsung SSD",
+        "capacityInGb": 480
+      },
+      {
+        "type": "SSD",
+        "name": "120GB Samsung SSD",
+        "capacityInGb": 480
+      }
+    ],
+    "storage-2": [
+      {
+        "type": "HDD",
+        "name": "2TB HDD SATA III 7200rpm",
+        "capacityInGb": 2000
+      },
+      {
+        "type": "HDD",
+        "name": "2TB HDD SATA III 7200rpm",
+        "capacityInGb": 2000
+      }
+    ],
+    "raid": [
+      {
+        "type": "RAID",
+        "name": "Hardware RAID-1"
+      }
+    ]
+  },
+  "uplink": {
+    "type": "UPLINK",
+    "name": "1Gbit/s",
+    "speedInMbits": 1000
+  },
+  "ip": {
+    "type": "IPv4",
+    "name": "4x IPv4 addresses",
+    "numberOfAddresses": 4
+  },
+}
+
+
+PLEASE reply with JSON as CODE BLOCK ONLY.
